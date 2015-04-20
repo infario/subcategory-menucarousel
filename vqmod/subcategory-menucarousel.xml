@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created using vQModerator's XML Generator by The Wizard of Osch for http://www.crystalcopy.nl //-->
+<!-- (Based on vQmod XML Generator by UKSB - http://www.opencart-extensions.co.uk) //-->
+<modification>
+	<id><![CDATA[JCarousel Menu]]></id>
+	<version><![CDATA[1.0]]></version>
+	<vqmver required="true"><![CDATA[2.4.1]]></vqmver>
+	<author><![CDATA[Naveen]]></author>
+	<file name="catalog/controller/common/header.php">
+		<operation error="abort" info="">
+			<search position="after"><![CDATA[$product_total = $this->model_catalog_product->getTotalProducts($data);]]></search>
+			<add><![CDATA[$this->load->model('tool/image');
+$image = empty($child['image']) ? 'no_image.jpg' : $child['image'];
+$thumb = $this->model_tool_image->resize($image, 50, 70);]]></add>
+		</operation>
+		<operation error="abort" info="">
+			<search position="before"><![CDATA['href'  => $this->url->link('product/category', 'path=' . $category['category_id'] . '_' . $child['category_id'])]]></search>
+			<add><![CDATA['thumb' => $thumb,]]></add>
+		</operation>
+		<operation error="abort" info="">
+			<search position="after"><![CDATA[$categories = $this->model_catalog_category->getCategories(0);]]></search>
+			<add><![CDATA[if (isset($this->request->get['route']) && $this->request->get['route'] != 'common/home') {
+		
+  $this->document->addScript('catalog/view/javascript/jquery/jquery.jcarousel.min.js');
+  
+  if (file_exists('catalog/view/theme/' . $this->config->get('config_template') . '/stylesheet/carousel.css')) {
+	$this->document->addStyle('catalog/view/theme/' . $this->config->get('config_template') . '/stylesheet/carousel.css');
+  } else {
+	$this->document->addStyle('catalog/view/theme/default/stylesheet/carousel.css');
+  }
+}]]></add>
+		</operation>
+	</file>
+	<file path="catalog/view/theme/*/template/common/" name="header.tpl">
+		<operation error="abort" info="">
+			<search position="before"><![CDATA[<?php if ($categories) { ?>]]></search>
+			<add><![CDATA[<?php /* ?>]]></add>
+		</operation>
+		<operation error="abort" info="">
+			<search position="before"><![CDATA[<?php if ($error) { ?>]]></search>
+			<add><![CDATA[<?php */ ?>]]></add>
+		</operation>
+		<operation error="abort" info="">
+			<search position="before"><![CDATA[<?php if ($error) { ?>]]></search>
+			<add><![CDATA[<?php if ($categories) { ?>
+<div id="menu">
+  <ul>
+    
+<?php foreach ($categories as $category) { ?>
+<li><a href="<?php echo $category['href']; ?>"><?php echo $category['name']; ?></a>
+<?php if ($category['children']) { ?>
+<div id="category-<?php echo preg_replace('/\s+/', '', $category['name']); ?>">
+<div class="carouselSubmenu">	  
+<ul class="jcarousel-skin-opencart"> 
+<?php foreach ($category['children'] as $childCategory) {  ?>    	
+<li><a href="<?php echo $childCategory['href']; ?>">
+<img src="<?php echo $childCategory['thumb']; ?>" alt="<?php echo $childCategory['name']; ?>" width="50" height="70" title ="<?php echo $childCategory['name']; ?>" />
+</a>
+<?php echo $childCategory['name']; ?>
+</li>
+<?php } ?>
+</ul>
+</div>
+</div>
+<?php } ?>	  
+</li>
+<?php } ?>
+  </ul>
+
+</div>
+
+<?php } ?>
+<script type = "text/javascript"><!--
+
+
+$('.carouselSubmenu ul').jcarousel({ 
+vertical:false,
+visible: 6,
+scroll: 1,
+auto: 0
+}); 
+
+var itemCount = $('.jcarousel-item').length;
+
+//$('.jcarousel-list-horizontal').width('1400px');
+$('#menu > ul > li > div').hide();
+$('#menu > ul > li').hover(function () {
+     clearTimeout($.data(this, 'timer'));
+     $('div', this).stop(true, true).slideDown(300);
+  }, function () {
+    $.data(this, 'timer', setTimeout($.proxy(function() {
+      $('div', this).stop(true, true).slideUp(300);
+    }, this), 100));
+  });
+//--></script>
+<style>
+#menu > ul > li ul > li > a:hover {
+	background: #5AF5EF;
+}  
+</style>]]></add>
+		</operation>
+		<operation error="abort" info="">
+			<search position="iafter"><![CDATA[<script type="text/javascript" src="catalog/view/javascript/common.js"></script>]]></search>
+			<add><![CDATA[<script type="text/javascript" src="catalog/view/javascript/jquery/jquery.jcarousel.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="catalog/view/theme/default/stylesheet/carousel.css" />]]></add>
+		</operation>
+	</file>
+</modification>
